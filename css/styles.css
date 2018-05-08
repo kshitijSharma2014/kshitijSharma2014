@@ -5,10 +5,6 @@
     cursor: pointer;
 }
 
-.user-desc-hover {
-    background-color: #fffedf;
-}
-
 .user-desc-onActive {
     background-color: #fffedf;
 }
@@ -86,5 +82,5 @@
 }
 
 .highlight {
-    color: red;
+    color: #598ee7;
 }
