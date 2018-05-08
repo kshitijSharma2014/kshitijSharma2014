@@ -1,0 +1,5 @@
+{
+  "name": "UserDetailBox",
+  "main": "./UserDetailBox.js",
+  "private": true
+}
