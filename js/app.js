@@ -23,10 +23,7 @@ class UniversalSearch extends React.Component {
   };
 
   getFilteredProducts = searchQuery => {
-    console.log("searchQuery", searchQuery);
     const lowerCaseSearchQuery = _toLower(searchQuery);
-    console.log("lowerCaseSearchQuery", lowerCaseSearchQuery);
-
     return _filter(userDetails, (userDetail) =>
     _toLower(userDetail.name).indexOf(lowerCaseSearchQuery) > -1 ||
       _toLower(userDetail.id).indexOf(lowerCaseSearchQuery) > -1 || _toLower(userDetail.address).indexOf(lowerCaseSearchQuery) > -1

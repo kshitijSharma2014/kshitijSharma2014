@@ -11669,10 +11669,7 @@ var UniversalSearch = function (_React$Component) {
     };
 
     _this.getFilteredProducts = function (searchQuery) {
-      console.log("searchQuery", searchQuery);
       var lowerCaseSearchQuery = (0, _toLower3.default)(searchQuery);
-      console.log("lowerCaseSearchQuery", lowerCaseSearchQuery);
-
       return (0, _filter3.default)(_dummyData.userDetails, function (userDetail) {
         return (0, _toLower3.default)(userDetail.name).indexOf(lowerCaseSearchQuery) > -1 || (0, _toLower3.default)(userDetail.id).indexOf(lowerCaseSearchQuery) > -1 || (0, _toLower3.default)(userDetail.address).indexOf(lowerCaseSearchQuery) > -1;
       });
@@ -24365,12 +24362,20 @@ var SearchResults = function (_React$Component) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = SearchResults.__proto__ || Object.getPrototypeOf(SearchResults)).call.apply(_ref, [this].concat(args))), _this), _this.userDetailsRenderer = function (userDetail) {
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = SearchResults.__proto__ || Object.getPrototypeOf(SearchResults)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
+      isFocused: true
+    }, _this.onFocusChange = function (isFocused) {
+      _this.setState({ isFocused: isFocused });
+    }, _this.userDetailsRenderer = function (userDetail, index) {
       return _react2.default.createElement(_UserDetailBox2.default, {
         id: userDetail.id,
         name: userDetail.name,
         address: userDetail.address,
-        searchQuery: _this.props.searchQuery
+        searchQuery: _this.props.searchQuery,
+        index: index,
+        lastIndex: _this.props.userDetails.length,
+        isFocused: _this.state.isFocused,
+        onFocusChange: _this.onFocusChange
       });
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
@@ -24488,8 +24493,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var UserDetailBox = function (_React$PureComponent) {
-  _inherits(UserDetailBox, _React$PureComponent);
+var UserDetailBox = function (_React$Component) {
+  _inherits(UserDetailBox, _React$Component);
 
   function UserDetailBox() {
     var _ref;
@@ -24511,32 +24516,87 @@ var UserDetailBox = function (_React$PureComponent) {
         return { __html: attr.substring(0, index) + "<span class='highlight'>" + attr.substring(index, index + searchQuery.length) + "</span>" + attr.substring(index + searchQuery.length) };
       }
       return { __html: attr };
+    }, _this.addClassToTarget = function (targetId) {
+      document.getElementById('' + targetId).classList.add('user-desc-onActive');
+    }, _this.removeClassFromTarget = function (targetId) {
+      document.getElementById('' + targetId).classList.remove('user-desc-onActive');
+    }, _this.onKeyPress = function (e) {
+      var targetId = +e.target.id;
+      if (e.which === 38 && +e.target.id > 0) {
+        _this.removeClassFromTarget(targetId);
+        _this.addClassToTarget(targetId - 1);
+        document.getElementById('' + (targetId - 1)).focus();
+        _this.props.onFocusChange(true);
+      } else if (e.which === 40 && targetId < _this.props.lastIndex - 1) {
+        _this.removeClassFromTarget(targetId);
+        _this.addClassToTarget(targetId + 1);
+        document.getElementById('' + (targetId + 1)).focus();
+        _this.props.onFocusChange(true);
+      }
+    }, _this.onBlur = function () {
+      _this.removeClassFromTarget(_this.props.index);
+      _this.props.onFocusChange(false);
+    }, _this.onClickUser = function (e) {
+      _this.props.onFocusChange(true);
+      _this.addClassToTarget(_this.props.index);
+      e.target.focus();
+    }, _this.hoverEvent = function () {
+      if (!_this.props.isFocused) {
+        _this.addClassToTarget(_this.props.index);
+      }
+    }, _this.onMouseLeaveEvent = function () {
+      if (!_this.props.isFocused) {
+        _this.removeClassFromTarget(_this.props.index);
+      }
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
   _createClass(UserDetailBox, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      if (this.props.index === 0) {
+        this.refs[this.props.index].focus();
+        this.refs[this.props.index].classList.add('user-desc-onActive');
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       var props = this.props;
 
       return _react2.default.createElement(
         'div',
-        { className: 'user-desc' },
-        _react2.default.createElement('div', { id: 'user-id', className: 'user-id', dangerouslySetInnerHTML: this.renderUserAttr(props.id) }),
-        _react2.default.createElement('div', { id: 'user-name', className: 'user-name', dangerouslySetInnerHTML: this.renderUserAttr(props.name) }),
-        _react2.default.createElement('div', { id: 'user-address', className: 'user-address', dangerouslySetInnerHTML: this.renderUserAttr(props.address) })
+        {
+          id: props.index,
+          className: 'user-desc',
+          onClick: this.onClickUser,
+          onMouseEnter: this.hoverEvent,
+          onMouseLeave: this.onMouseLeaveEvent,
+          onKeyDown: this.onKeyPress,
+          onBlur: this.onBlur,
+          tabIndex: this.props.index,
+          autoFocus: props.index === 0,
+          ref: this.props.index
+        },
+        _react2.default.createElement('div', { className: 'user-id', dangerouslySetInnerHTML: this.renderUserAttr(props.id) }),
+        _react2.default.createElement('div', { className: 'user-name', dangerouslySetInnerHTML: this.renderUserAttr(props.name) }),
+        _react2.default.createElement('div', { className: 'user-address', dangerouslySetInnerHTML: this.renderUserAttr(props.address) })
       );
     }
   }]);
 
   return UserDetailBox;
-}(_react2.default.PureComponent);
+}(_react2.default.Component);
 
 UserDetailBox.propTypes = {
   id: _propTypes2.default.number,
   name: _propTypes2.default.string,
   address: _propTypes2.default.string,
-  searchQuery: _propTypes2.default.string
+  searchQuery: _propTypes2.default.string,
+  index: _propTypes2.default.number,
+  lastIndex: _propTypes2.default.number,
+  isFocused: _propTypes2.default.bool,
+  onFocusChange: _propTypes2.default.func
 };
 exports.default = UserDetailBox;
 

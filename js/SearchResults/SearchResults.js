@@ -11,13 +11,25 @@ class SearchResults extends React.Component {
     searchQuery: PropTypes.string,
   };
 
-  userDetailsRenderer = (userDetail) => {
+  state = {
+    isFocused: true,
+  };
+
+  onFocusChange = (isFocused) => {
+    this.setState({isFocused});
+  };
+
+  userDetailsRenderer = (userDetail, index) => {
     return (
         <UserDetailBox
           id={userDetail.id}
           name={userDetail.name}
           address={userDetail.address}
           searchQuery={this.props.searchQuery}
+          index={index}
+          lastIndex={this.props.userDetails.length}
+          isFocused={this.state.isFocused}
+          onFocusChange={this.onFocusChange}
         />
     )
   };
